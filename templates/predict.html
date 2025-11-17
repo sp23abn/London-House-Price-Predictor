@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+
+{% block title %}Predict - London House Price Predictor{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>Predict House Price</h2>
+            <p class="section-subtitle">Fill in the property details below to get an accurate price estimate</p>
+        </div>
+
+        <div class="grid grid-2">
+            <!-- Prediction Form -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Property Details</h3>
+                    </div>
+                    <form method="POST" action="{{ url_for('predict') }}">
+                        <!-- Location -->
+                        <div class="form-group">
+                            <label for="location">Location (Borough)</label>
+                            <select id="location" name="location" required>
+                                <option value="">Select a borough...</option>
+                                <option value="central">Central London</option>
+                                <option value="north">North London</option>
+                                <option value="south">South London</option>
+                                <option value="east">East London</option>
+                                <option value="west">West London</option>
+                                <option value="southwest">Southwest London</option>
+                            </select>
+                        </div>
+
+                        <!-- Property Type -->
+                        <div class="form-group">
+                            <label for="property_type">Property Type</label>
+                            <select id="property_type" name="property_type" required>
+                                <option value="">Select property type...</option>
+                                <option value="detached">Detached House</option>
+                                <option value="semi">Semi-Detached House</option>
+                                <option value="terraced">Terraced House</option>
+                                <option value="flat">Flat/Apartment</option>
+                                <option value="bungalow">Bungalow</option>
+                            </select>
+                        </div>
+
+                        <!-- Bedrooms and Area Row -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="bedrooms">Bedrooms</label>
+                                <input type="number" id="bedrooms" name="bedrooms" min="1" max="10" placeholder="e.g., 3" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="area">Area (sq. metres)</label>
+                                <input type="number" id="area" name="area" min="20" max="1000" placeholder="e.g., 150" step="0.1" required>
+                            </div>
+                        </div>
+
+                        <!-- Year Built and Distance Row -->
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="year_built">Year Built</label>
+                                <input type="number" id="year_built" name="year_built" min="1800" max="2025" placeholder="e.g., 2010" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="distance_station">Distance to Nearest Station (km)</label>
+                                <input type="number" id="distance_station" name="distance_station" min="0" max="50" placeholder="e.g., 0.5" step="0.1" required>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary btn-block" style="margin-top: 1.5rem;">Get Price Prediction</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Sample Result Display -->
+            <div>
+                <div class="prediction-result">
+                    <div class="section-header" style="margin: 0 0 1.5rem 0; text-align: left; border-bottom: none; padding: 0;">
+                        <h3 class="card-title" style="margin: 0;">Sample Prediction</h3>
+                    </div>
+                    
+                    <div class="prediction-price">
+                        £850,000
+                    </div>
+                    
+                    <div class="prediction-range">
+                        <strong>Confidence Range:</strong> £780,000 - £920,000
+                    </div>
+
+                    <div class="alert alert-info" style="margin: 1.5rem 0;">
+                        <strong>✓ Prediction Details:</strong> 3-bed terraced house in North London, 120 sq.m, built 1995, 0.8km from nearest station
+                    </div>
+
+                    <div class="feature-impacts">
+                        <h3>Important Feature Impacts</h3>
+                        
+                        <div class="impact-item">
+                            <span class="impact-label">Location (North London)</span>
+                            <div class="impact-bar">
+                                <div class="impact-fill" style="width: 85%;"></div>
+                            </div>
+                            <span class="impact-value">+18%</span>
+                        </div>
+
+                        <div class="impact-item">
+                            <span class="impact-label">Property Age</span>
+                            <div class="impact-bar">
+                                <div class="impact-fill" style="width: 65%;"></div>
+                            </div>
+                            <span class="impact-value">+12%</span>
+                        </div>
+
+                        <div class="impact-item">
+                            <span class="impact-label">Area (120 sq.m)</span>
+                            <div class="impact-bar">
+                                <div class="impact-fill" style="width: 75%;"></div>
+                            </div>
+                            <span class="impact-value">+14%</span>
+                        </div>
+
+                        <div class="impact-item">
+                            <span class="impact-label">Bedrooms (3)</span>
+                            <div class="impact-bar">
+                                <div class="impact-fill" style="width: 60%;"></div>
+                            </div>
+                            <span class="impact-value">+10%</span>
+                        </div>
+
+                        <div class="impact-item">
+                            <span class="impact-label">Station Distance (0.8km)</span>
+                            <div class="impact-bar">
+                                <div class="impact-fill" style="width: 70%;"></div>
+                            </div>
+                            <span class="impact-value">+13%</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(37, 99, 235, 0.2);">
+                        <p style="font-size: 0.9rem; color: var(--text-light); margin: 0;">
+                            💡 This is a sample prediction. Submit the form to get a real prediction based on your property details.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Tips Section -->
+<section class="section" style="background-color: var(--surface-color);">
+    <div class="container">
+        <h2 style="text-align: center; margin-bottom: 2rem;">Tips for Accurate Predictions</h2>
+        
+        <div class="grid grid-3">
+            <div class="card">
+                <h3>📊 Accurate Data</h3>
+                <p>Provide precise information about your property. The more accurate the input, the better the prediction.</p>
+            </div>
+            <div class="card">
+                <h3>🏘️ Location Matters</h3>
+                <p>Select the correct borough. Location is one of the most important factors in property valuation.</p>
+            </div>
+            <div class="card">
+                <h3>🚇 Station Proximity</h3>
+                <p>Properties closer to public transport tend to have higher values. Be precise with the distance.</p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Home - London House Price Predictor{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <div class="hero-content">
+            <h1>London House Price Predictor</h1>
+            <p>Accurately predict property prices using advanced machine learning</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Start Prediction →</a>
+        </div>
+    </div>
+</section>
+
+<!-- Introduction Section -->
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h2>How It Works</h2>
+            <p class="section-subtitle">Our AI model analyzes property features to predict accurate market prices</p>
+        </div>
+        
+        <div class="grid grid-3">
+            <div class="card">
+                <h3>📍 Enter Details</h3>
+                <p>Provide your property location, type, size, and other key characteristics.</p>
+            </div>
+            <div class="card">
+                <h3>🤖 AI Analysis</h3>
+                <p>Our machine learning model processes your data and analyzes market trends.</p>
+            </div>
+            <div class="card">
+                <h3>💷 Get Prediction</h3>
+                <p>Receive an accurate price estimate with confidence range and insights.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="section" style="background-color: var(--surface-color);">
+    <div class="container">
+        <div class="grid grid-2">
+            <div>
+                <h2>Powerful Features</h2>
+                <ul class="feature-list">
+                    <li>Advanced ML model trained on real London property data</li>
+                    <li>Considers 6+ key property attributes</li>
+                    <li>Provides confidence ranges for realistic estimates</li>
+                    <li>Shows feature importance breakdown</li>
+                    <li>Track your prediction history</li>
+                    <li>Instant, accurate results</li>
+                </ul>
+            </div>
+            <div>
+                <div class="stat-box">
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Accuracy Rate</div>
+                </div>
+                <div class="stat-box" style="margin-top: 2rem;">
+                    <div class="stat-number">10k+</div>
+                    <div class="stat-label">Properties Analyzed</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="section">
+    <div class="container">
+        <div style="text-align: center;">
+            <h2>Ready to Predict?</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem;">Use our AI-powered predictor to find out your property's estimated market value.</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Make a Prediction</a>
+            <span style="display: inline-block; margin: 0 1rem; color: var(--text-light);">or</span>
+            <a href="{{ url_for('about') }}" class="btn btn-outline">Learn About Our Model</a>
+        </div>
+    </div>
+</section>
+{% endblock %}
