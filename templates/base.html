@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}London House Price Predictor{% endblock %}</title>
+    <title>{% block title %}LHP — London House Price Predictor{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
     <nav class="navbar">
         <div class="container">
             <div class="nav-brand">
-                <a href="{{ url_for('home') }}" class="logo">🏠 London House Predictor</a>
+                <a href="{{ url_for('home') }}" class="logo">LHP_PREDICTOR</a>
             </div>
             <ul class="nav-menu">
-                <li><a href="{{ url_for('home') }}" class="nav-link">Home</a></li>
-                <li><a href="{{ url_for('predict') }}" class="nav-link">Predict</a></li>
-                <li><a href="{{ url_for('recent') }}" class="nav-link">Recent</a></li>
-                <li><a href="{{ url_for('about') }}" class="nav-link">About</a></li>
-                <li><a href="{{ url_for('contact') }}" class="nav-link">Contact</a></li>
+                <li><a href="{{ url_for('home') }}"    class="nav-link" data-page="home">Home</a></li>
+                <li><a href="{{ url_for('predict') }}" class="nav-link" data-page="predict">Predict</a></li>
+                <li><a href="{{ url_for('recent') }}"  class="nav-link" data-page="recent">Recent</a></li>
+                <li><a href="{{ url_for('about') }}"   class="nav-link" data-page="about">About</a></li>
+                <li><a href="{{ url_for('contact') }}" class="nav-link" data-page="contact">Contact</a></li>
             </ul>
         </div>
     </nav>
@@ -28,9 +31,18 @@
 
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 London House Price Predictor. All rights reserved.</p>
+            <p>// LHP_PREDICTOR &nbsp;·&nbsp; Gradient Boosting ML &nbsp;·&nbsp; London Property Data &nbsp;·&nbsp; &copy; 2026</p>
         </div>
     </footer>
+
+    <!-- Live Users Widget -->
+    <div class="live-users-widget">
+        <div class="live-indicator"></div>
+        <div class="live-users-count">
+            <span class="user-count">1</span>
+            <span class="user-label">online</span>
+        </div>
+    </div>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
 </body>

@@ -1,0 +1,28 @@
+{
+    "model_name": "XGBoost",
+    "training_date": "2026-02-13 19:55:23",
+    "r2_score": 0.7053724527359009,
+    "mae": 412124.86702473956,
+    "rmse": 646753.6514598443,
+    "features": [
+        "House Type Encoded",
+        "Area in sq ft",
+        "No. of Bedrooms",
+        "No. of Bathrooms",
+        "No. of Receptions",
+        "Location Encoded"
+    ],
+    "house_types": [
+        "Bungalow",
+        "Duplex",
+        "Flat / Apartment",
+        "House",
+        "Mews",
+        "New development",
+        "Penthouse",
+        "Studio"
+    ],
+    "num_locations": 640,
+    "training_samples": 2688,
+    "test_samples": 672
+}

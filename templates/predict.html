@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Predict - London House Price Predictor{% endblock %}
+{% block title %}Predict — LHP Predictor{% endblock %}
 
 {% block content %}
 <section class="section">
     <div class="container">
         <div class="section-header">
-            <h2>Predict House Price</h2>
-            <p class="section-subtitle">Fill in the property details below to get an accurate price estimate</p>
+            <h2>Price Prediction</h2>
+            <p class="section-subtitle">Enter property details — the Gradient Boosting model will return an estimated market value</p>
         </div>
 
         <div class="grid grid-2">
@@ -20,15 +20,12 @@
                     <form method="POST" action="{{ url_for('predict') }}">
                         <!-- Location -->
                         <div class="form-group">
-                            <label for="location">Location (Borough)</label>
+                            <label for="location">Location</label>
                             <select id="location" name="location" required>
-                                <option value="">Select a borough...</option>
-                                <option value="central">Central London</option>
-                                <option value="north">North London</option>
-                                <option value="south">South London</option>
-                                <option value="east">East London</option>
-                                <option value="west">West London</option>
-                                <option value="southwest">Southwest London</option>
+                                <option value="">Select a location...</option>
+                                {% for loc in locations %}
+                                <option value="{{ loc }}" {% if form_data and form_data.location == loc %}selected{% endif %}>{{ loc.strip() }}</option>
+                                {% endfor %}
                             </select>
                         </div>
 
@@ -37,35 +34,33 @@
                             <label for="property_type">Property Type</label>
                             <select id="property_type" name="property_type" required>
                                 <option value="">Select property type...</option>
-                                <option value="detached">Detached House</option>
-                                <option value="semi">Semi-Detached House</option>
-                                <option value="terraced">Terraced House</option>
-                                <option value="flat">Flat/Apartment</option>
-                                <option value="bungalow">Bungalow</option>
+                                {% for ht in house_types %}
+                                <option value="{{ ht }}" {% if form_data and form_data.property_type == ht %}selected{% endif %}>{{ ht }}</option>
+                                {% endfor %}
                             </select>
                         </div>
 
-                        <!-- Bedrooms and Area Row -->
+                        <!-- Bedrooms and Bathrooms Row -->
                         <div class="form-row">
                             <div class="form-group">
                                 <label for="bedrooms">Bedrooms</label>
-                                <input type="number" id="bedrooms" name="bedrooms" min="1" max="10" placeholder="e.g., 3" required>
+                                <input type="number" id="bedrooms" name="bedrooms" min="1" max="20" placeholder="e.g., 3" value="{{ form_data.bedrooms if form_data }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="area">Area (sq. metres)</label>
-                                <input type="number" id="area" name="area" min="20" max="1000" placeholder="e.g., 150" step="0.1" required>
+                                <label for="bathrooms">Bathrooms</label>
+                                <input type="number" id="bathrooms" name="bathrooms" min="1" max="20" placeholder="e.g., 2" value="{{ form_data.bathrooms if form_data }}" required>
                             </div>
                         </div>
 
-                        <!-- Year Built and Distance Row -->
+                        <!-- Receptions and Area Row -->
                         <div class="form-row">
                             <div class="form-group">
-                                <label for="year_built">Year Built</label>
-                                <input type="number" id="year_built" name="year_built" min="1800" max="2025" placeholder="e.g., 2010" required>
+                                <label for="receptions">Reception Rooms</label>
+                                <input type="number" id="receptions" name="receptions" min="0" max="10" placeholder="e.g., 1" value="{{ form_data.receptions if form_data }}" required>
                             </div>
                             <div class="form-group">
-                                <label for="distance_station">Distance to Nearest Station (km)</label>
-                                <input type="number" id="distance_station" name="distance_station" min="0" max="50" placeholder="e.g., 0.5" step="0.1" required>
+                                <label for="area">Area (sq ft)</label>
+                                <input type="number" id="area" name="area" min="100" max="20000" placeholder="e.g., 1200" step="1" value="{{ form_data.area if form_data }}" required>
                             </div>
                         </div>
 
@@ -75,97 +70,122 @@
                 </div>
             </div>
 
-            <!-- Sample Result Display -->
+            <!-- Result Display / Loading -->
             <div>
-                <div class="prediction-result">
+                <!-- Loading State -->
+                <div class="prediction-loading" id="predictionLoading" style="display: none;">
+                    <div class="loading-spinner"></div>
+                    <h3>Processing Your Request</h3>
+                    <p>Analyzing property details and generating prediction...</p>
+                </div>
+
+                <!-- Error State -->
+                {% if error %}
+                <div class="model-warning" id="modelWarning">
+                    <div class="warning-icon">⚠️</div>
+                    <h3>Prediction Error</h3>
+                    <p>{{ error }}</p>
+                </div>
+
+                <!-- Real Prediction Result -->
+                {% elif prediction is not none %}
+                <div class="prediction-result" id="predictionResult">
                     <div class="section-header" style="margin: 0 0 1.5rem 0; text-align: left; border-bottom: none; padding: 0;">
-                        <h3 class="card-title" style="margin: 0;">Sample Prediction</h3>
+                        <h3 class="card-title" style="margin: 0;">Estimated Price</h3>
                     </div>
-                    
+
                     <div class="prediction-price">
-                        £850,000
+                        £{{ "{:,.0f}".format(prediction) }}
                     </div>
-                    
+
                     <div class="prediction-range">
-                        <strong>Confidence Range:</strong> £780,000 - £920,000
+                        <strong>Confidence Range:</strong>
+                        £{{ "{:,.0f}".format(prediction_low) }} – £{{ "{:,.0f}".format(prediction_high) }}
                     </div>
 
                     <div class="alert alert-info" style="margin: 1.5rem 0;">
-                        <strong>✓ Prediction Details:</strong> 3-bed terraced house in North London, 120 sq.m, built 1995, 0.8km from nearest station
+                        <strong>✓ Prediction Details:</strong>
+                        {{ form_data.bedrooms }}-bed {{ form_data.property_type }} in {{ form_data.location.strip() }},
+                        {{ form_data.area }} sq ft,
+                        {{ form_data.bathrooms }} bath, {{ form_data.receptions }} reception
                     </div>
 
                     <div class="feature-impacts">
-                        <h3>Important Feature Impacts</h3>
-                        
+                        <h3>Key Inputs Used</h3>
                         <div class="impact-item">
-                            <span class="impact-label">Location (North London)</span>
-                            <div class="impact-bar">
-                                <div class="impact-fill" style="width: 85%;"></div>
-                            </div>
-                            <span class="impact-value">+18%</span>
+                            <span class="impact-label">Location</span>
+                            <div class="impact-bar"><div class="impact-fill" style="width: 85%;"></div></div>
+                            <span class="impact-value">{{ form_data.location.strip() }}</span>
                         </div>
-
                         <div class="impact-item">
-                            <span class="impact-label">Property Age</span>
-                            <div class="impact-bar">
-                                <div class="impact-fill" style="width: 65%;"></div>
-                            </div>
-                            <span class="impact-value">+12%</span>
+                            <span class="impact-label">Property Type</span>
+                            <div class="impact-bar"><div class="impact-fill" style="width: 65%;"></div></div>
+                            <span class="impact-value">{{ form_data.property_type }}</span>
                         </div>
-
                         <div class="impact-item">
-                            <span class="impact-label">Area (120 sq.m)</span>
-                            <div class="impact-bar">
-                                <div class="impact-fill" style="width: 75%;"></div>
-                            </div>
-                            <span class="impact-value">+14%</span>
+                            <span class="impact-label">Area</span>
+                            <div class="impact-bar"><div class="impact-fill" style="width: 75%;"></div></div>
+                            <span class="impact-value">{{ form_data.area }} sq ft</span>
                         </div>
-
                         <div class="impact-item">
-                            <span class="impact-label">Bedrooms (3)</span>
-                            <div class="impact-bar">
-                                <div class="impact-fill" style="width: 60%;"></div>
-                            </div>
-                            <span class="impact-value">+10%</span>
+                            <span class="impact-label">Bedrooms</span>
+                            <div class="impact-bar"><div class="impact-fill" style="width: 60%;"></div></div>
+                            <span class="impact-value">{{ form_data.bedrooms }}</span>
                         </div>
-
                         <div class="impact-item">
-                            <span class="impact-label">Station Distance (0.8km)</span>
-                            <div class="impact-bar">
-                                <div class="impact-fill" style="width: 70%;"></div>
-                            </div>
-                            <span class="impact-value">+13%</span>
+                            <span class="impact-label">Bathrooms</span>
+                            <div class="impact-bar"><div class="impact-fill" style="width: 55%;"></div></div>
+                            <span class="impact-value">{{ form_data.bathrooms }}</span>
                         </div>
                     </div>
+                </div>
 
+                <!-- Placeholder before first submission -->
+                {% else %}
+                <div class="prediction-result" id="predictionResult">
+                    <div class="section-header" style="margin: 0 0 1.5rem 0; text-align: left; border-bottom: none; padding: 0;">
+                        <h3 class="card-title" style="margin: 0;">Your Prediction</h3>
+                    </div>
+                    <div class="prediction-price" style="color: var(--text-light);">
+                        —
+                    </div>
+                    <div class="prediction-range">
+                        Fill in the form and click <strong>Get Price Prediction</strong> to see the estimated value.
+                    </div>
                     <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(37, 99, 235, 0.2);">
                         <p style="font-size: 0.9rem; color: var(--text-light); margin: 0;">
-                            💡 This is a sample prediction. Submit the form to get a real prediction based on your property details.
+                            💡 Predictions are generated by a Gradient Boosting model trained on London property data.
                         </p>
                     </div>
                 </div>
+                {% endif %}
             </div>
         </div>
     </div>
 </section>
 
 <!-- Tips Section -->
-<section class="section" style="background-color: var(--surface-color);">
+<section class="section" style="background-color: var(--bg-surface);">
     <div class="container">
-        <h2 style="text-align: center; margin-bottom: 2rem;">Tips for Accurate Predictions</h2>
-        
+        <div class="section-header">
+            <h2>Input Guidelines</h2>
+            <p class="section-subtitle">How to get the most accurate prediction</p>
+        </div>
         <div class="grid grid-3">
             <div class="card">
-                <h3>📊 Accurate Data</h3>
-                <p>Provide precise information about your property. The more accurate the input, the better the prediction.</p>
+                <div class="card-header"><span class="card-title">Area in sq ft</span></div>
+                <p>Enter the total internal floor area in square feet. This is the strongest numeric predictor. Convert from sq metres × 10.764 if needed.</p>
+                <span class="badge badge-success">High Impact</span>
             </div>
             <div class="card">
-                <h3>🏘️ Location Matters</h3>
-                <p>Select the correct borough. Location is one of the most important factors in property valuation.</p>
+                <div class="card-header"><span class="card-title">Location</span></div>
+                <p>Select the exact location from the dropdown — 657 London locations are available, all from the training dataset. Label-encoded at inference time.</p>
+                <span class="badge badge-success">High Impact</span>
             </div>
             <div class="card">
-                <h3>🚇 Station Proximity</h3>
-                <p>Properties closer to public transport tend to have higher values. Be precise with the distance.</p>
+                <div class="card-header"><span class="card-title">Property Type</span></div>
+                <p>Choose from the 8 types in the training data: Bungalow, Duplex, Flat/Apartment, House, Mews, New development, Penthouse, Studio.</p>
+                <span class="badge badge-primary">Medium Impact</span>
             </div>
         </div>
     </div>

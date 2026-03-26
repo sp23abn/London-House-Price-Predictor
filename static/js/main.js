@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeFormValidation();
     initializeNavigation();
     initializeAnimations();
+    initializeLiveUsersWidget();
+    initializePredictionForm();
 });
 
 /**
@@ -94,21 +96,20 @@ function validateField(field) {
  * @param {string} message - The error message
  */
 function addFieldError(field, message) {
-    field.style.borderColor = '#ef4444';
-    field.style.backgroundColor = '#fee2e2';
-    
-    // Remove existing error message
+    field.style.borderColor = 'var(--danger, #ff4d6a)';
+    field.style.boxShadow = '0 0 0 3px rgba(255,77,106,0.1)';
+
     removeFieldError(field);
-    
-    // Create and insert error message
+
     const errorMsg = document.createElement('small');
     errorMsg.className = 'field-error';
-    errorMsg.style.color = '#991b1b';
-    errorMsg.style.fontSize = '0.875rem';
-    errorMsg.style.marginTop = '0.25rem';
+    errorMsg.style.color = 'var(--danger, #ff4d6a)';
+    errorMsg.style.fontFamily = 'var(--mono, monospace)';
+    errorMsg.style.fontSize = '0.75rem';
+    errorMsg.style.marginTop = '0.3rem';
     errorMsg.style.display = 'block';
     errorMsg.textContent = message;
-    
+
     field.parentNode.appendChild(errorMsg);
 }
 
@@ -118,28 +119,24 @@ function addFieldError(field, message) {
  */
 function removeFieldError(field) {
     field.style.borderColor = '';
-    field.style.backgroundColor = '';
-    
-    // Remove error message if it exists
+    field.style.boxShadow = '';
+
     const errorMsg = field.parentNode.querySelector('.field-error');
-    if (errorMsg) {
-        errorMsg.remove();
-    }
+    if (errorMsg) errorMsg.remove();
 }
 
 /**
- * Initialize navigation features
+ * Initialize navigation features — mark active link based on current path
  */
 function initializeNavigation() {
     const navLinks = document.querySelectorAll('.nav-link');
     const currentPath = window.location.pathname;
-    
+
     navLinks.forEach(link => {
         const href = link.getAttribute('href');
+        // exact match, or root path
         if (href === currentPath || (currentPath === '/' && href === '/')) {
-            link.style.color = 'var(--primary-color)';
-            link.style.borderBottom = '2px solid var(--primary-color)';
-            link.style.paddingBottom = '2px';
+            link.classList.add('active');
         }
     });
 }
@@ -291,3 +288,136 @@ function addDynamicStyles() {
 
 // Add dynamic styles on page load
 addDynamicStyles();
+
+/**
+ * Initialize live users widget
+ * Simulates live users with SessionStorage and updates count
+ */
+function initializeLiveUsersWidget() {
+    // Generate a unique session ID for this tab/window
+    const sessionId = 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    
+    // Function to send heartbeat and update user count
+    function updateLiveUsersCount() {
+        // Send session to server for tracking
+        fetch('/api/track-user', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ sessionId: sessionId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const userCountElement = document.querySelector('.user-count');
+            const userLabelElement = document.querySelector('.user-label');
+            
+            if (userCountElement && data.active_users) {
+                const currentCount = parseInt(userCountElement.textContent) || 1;
+                const newCount = data.active_users;
+                
+                // Update count if changed
+                if (currentCount !== newCount) {
+                    userCountElement.style.opacity = '0.7';
+                    userCountElement.textContent = newCount;
+                    
+                    // Update label (singular/plural)
+                    if (userLabelElement) {
+                        userLabelElement.textContent = newCount === 1 ? 'User Live' : 'Users Live';
+                    }
+                    
+                    setTimeout(() => {
+                        userCountElement.style.opacity = '1';
+                    }, 200);
+                }
+            }
+        })
+        .catch(error => {
+            console.warn('Could not update user count:', error);
+        });
+    }
+    
+    // Initial update
+    updateLiveUsersCount();
+    
+    // Update count every 2 seconds
+    setInterval(updateLiveUsersCount, 2000);
+}
+
+/**
+/**
+ * Initialize prediction form – show loading spinner then allow normal POST submit
+ */
+function initializePredictionForm() {
+    const form = document.querySelector('form[action*="predict"]');
+
+    if (!form) return;
+
+    form.addEventListener('submit', function() {
+        // Show loading spinner while the page navigates to POST response
+        showLoadingState();
+    });
+}
+
+/**
+ * Show loading state on prediction form
+ */
+function showLoadingState() {
+    const loadingElement = document.getElementById('predictionLoading');
+    const resultElement = document.getElementById('predictionResult');
+    const warningElement = document.getElementById('modelWarning');
+
+    if (loadingElement) {
+        loadingElement.style.display = 'block';
+    }
+    if (resultElement) {
+        resultElement.style.display = 'none';
+    }
+    if (warningElement) {
+        warningElement.style.display = 'none';
+    }
+}
+
+/**
+ * Hide loading state
+ */
+function hideLoadingState() {
+    const loadingElement = document.getElementById('predictionLoading');
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+}
+
+/**
+ * Show model warning when not trained
+ */
+function showModelWarning() {
+    const warningElement = document.getElementById('modelWarning');
+    const resultElement = document.getElementById('predictionResult');
+    const loadingElement = document.getElementById('predictionLoading');
+
+    if (warningElement) {
+        warningElement.style.display = 'block';
+    }
+    if (resultElement) {
+        resultElement.style.display = 'none';
+    }
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+}
+
+/**
+ * Show prediction result
+ */
+function showPredictionResult() {
+    const resultElement = document.getElementById('predictionResult');
+    const warningElement = document.getElementById('modelWarning');
+
+    if (resultElement) {
+        resultElement.style.display = 'block';
+    }
+    if (warningElement) {
+        warningElement.style.display = 'none';
+    }
+}

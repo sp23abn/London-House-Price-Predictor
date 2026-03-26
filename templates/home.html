@@ -1,83 +1,121 @@
 {% extends 'base.html' %}
 
-{% block title %}Home - London House Price Predictor{% endblock %}
+{% block title %}LHP — London House Price Predictor{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
         <div class="hero-content">
-            <h1>London House Price Predictor</h1>
-            <p>Accurately predict property prices using advanced machine learning</p>
-            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Start Prediction →</a>
+            <div class="hero-tag">ML_MODEL :: Gradient Boosting &nbsp;|&nbsp; R² = 0.66</div>
+            <h1>London House<br>Price Predictor</h1>
+            <p>Enter property details and get an instant market value estimate powered by a Gradient Boosting regression model trained on 3,480 London property records.</p>
+            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Run Prediction →</a>
+            &nbsp;&nbsp;
+            <a href="{{ url_for('about') }}" class="btn btn-outline">Model Details</a>
         </div>
     </div>
 </section>
 
-<!-- Introduction Section -->
+<!-- How It Works -->
 <section class="section">
     <div class="container">
         <div class="section-header">
             <h2>How It Works</h2>
-            <p class="section-subtitle">Our AI model analyzes property features to predict accurate market prices</p>
+            <p class="section-subtitle">Three steps from input to prediction</p>
         </div>
-        
+
         <div class="grid grid-3">
             <div class="card">
-                <h3>📍 Enter Details</h3>
-                <p>Provide your property location, type, size, and other key characteristics.</p>
+                <div class="card-header"><span class="card-title">01 &mdash; Input</span></div>
+                <p>Provide property location, type, area (sq ft), bedrooms, bathrooms, and reception rooms.</p>
+                <span class="badge badge-primary">Form Input</span>
             </div>
             <div class="card">
-                <h3>🤖 AI Analysis</h3>
-                <p>Our machine learning model processes your data and analyzes market trends.</p>
+                <div class="card-header"><span class="card-title">02 &mdash; Encode</span></div>
+                <p>Categorical fields are label-encoded using encoders fitted on the London.csv training dataset.</p>
+                <span class="badge badge-warning">Preprocessing</span>
             </div>
             <div class="card">
-                <h3>💷 Get Prediction</h3>
-                <p>Receive an accurate price estimate with confidence range and insights.</p>
+                <div class="card-header"><span class="card-title">03 &mdash; Predict</span></div>
+                <p>The Gradient Boosting model outputs an estimated price with a ±10% confidence range.</p>
+                <span class="badge badge-success">ML Inference</span>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="section" style="background-color: var(--surface-color);">
+<!-- Features & Stats -->
+<section class="section" style="background-color: var(--bg-surface);">
     <div class="container">
-        <div class="grid grid-2">
+        <div class="grid grid-2" style="align-items: start;">
             <div>
-                <h2>Powerful Features</h2>
+                <h2 style="margin-bottom: 1.5rem;">Capabilities</h2>
                 <ul class="feature-list">
-                    <li>Advanced ML model trained on real London property data</li>
-                    <li>Considers 6+ key property attributes</li>
-                    <li>Provides confidence ranges for realistic estimates</li>
-                    <li>Shows feature importance breakdown</li>
-                    <li>Track your prediction history</li>
-                    <li>Instant, accurate results</li>
+                    <li>Gradient Boosting model trained on real London property data</li>
+                    <li>7 engineered features per prediction</li>
+                    <li>657 unique London locations supported</li>
+                    <li>8 property types (House, Flat, Penthouse, Studio…)</li>
+                    <li>±10% confidence band on every output</li>
+                    <li>Sub-second inference time</li>
                 </ul>
+                <div style="margin-top: 2rem;">
+                    <a href="{{ url_for('predict') }}" class="btn btn-primary">Start Predicting</a>
+                </div>
             </div>
             <div>
-                <div class="stat-box">
-                    <div class="stat-number">99%</div>
-                    <div class="stat-label">Accuracy Rate</div>
-                </div>
-                <div class="stat-box" style="margin-top: 2rem;">
-                    <div class="stat-number">10k+</div>
-                    <div class="stat-label">Properties Analyzed</div>
+                <div class="terminal">
+                    <div><span class="t-comment"># model_info.json</span></div>
+                    <div><span class="t-key">"best_model"</span>: <span class="t-value">"Gradient Boosting"</span>,</div>
+                    <div><span class="t-key">"r2_score"</span>:   <span class="t-value">0.6609</span>,</div>
+                    <div><span class="t-key">"mae"</span>:        <span class="t-value">£552,468</span>,</div>
+                    <div><span class="t-key">"rmse"</span>:       <span class="t-value">£1,040,023</span>,</div>
+                    <div><span class="t-key">"train_samples"</span>: <span class="t-value">2,784</span>,</div>
+                    <div><span class="t-key">"test_samples"</span>:  <span class="t-value">696</span>,</div>
+                    <div><span class="t-key">"features"</span>: [</div>
+                    <div>&nbsp;&nbsp;<span class="t-value">"Area in sq ft"</span>,</div>
+                    <div>&nbsp;&nbsp;<span class="t-value">"No. of Bedrooms"</span>,</div>
+                    <div>&nbsp;&nbsp;<span class="t-value">"No. of Bathrooms"</span>,</div>
+                    <div>&nbsp;&nbsp;<span class="t-value">"Location Encoded"</span>, ...</div>
+                    <div>]</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section -->
+<!-- Model Stats -->
 <section class="section">
     <div class="container">
-        <div style="text-align: center;">
-            <h2>Ready to Predict?</h2>
-            <p style="font-size: 1.1rem; margin-bottom: 2rem;">Use our AI-powered predictor to find out your property's estimated market value.</p>
-            <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Make a Prediction</a>
-            <span style="display: inline-block; margin: 0 1rem; color: var(--text-light);">or</span>
-            <a href="{{ url_for('about') }}" class="btn btn-outline">Learn About Our Model</a>
+        <div class="section-header">
+            <h2>Model Performance</h2>
+            <p class="section-subtitle">Evaluated on held-out test set (20% of dataset)</p>
         </div>
+        <div class="grid grid-3">
+            <div class="stat-box">
+                <div class="stat-number">0.66</div>
+                <div class="stat-label">R² Score</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">3,480</div>
+                <div class="stat-label">Training Records</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number">657</div>
+                <div class="stat-label">Locations</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="section" style="background-color: var(--bg-surface);">
+    <div class="container" style="text-align: center;">
+        <h2>Ready to get a price estimate?</h2>
+        <p style="font-size: 1rem; margin-bottom: 2rem; max-width: 480px; margin-left: auto; margin-right: auto;">Fill in your property details and the model will return an estimated market value instantly.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-primary btn-lg">Make a Prediction</a>
+        &nbsp;&nbsp;
+        <a href="{{ url_for('about') }}" class="btn btn-outline">Learn About the Model</a>
     </div>
 </section>
 {% endblock %}
